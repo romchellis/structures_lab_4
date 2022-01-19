@@ -14,6 +14,16 @@ import java.util.Objects;
 public class Key {
     static final String pattern = "(\\d[A-Z]{4}\\d)";
 
+    public boolean isRemoved() {
+        return removed;
+    }
+
+    public void setRemoved() {
+        this.removed = true;
+    }
+
+    private boolean removed;
+
     public String getValue() {
         return value;
     }

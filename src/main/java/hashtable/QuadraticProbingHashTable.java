@@ -49,7 +49,7 @@ public class QuadraticProbingHashTable implements HashTable<Integer> {
         int tmp = key.hashCode() % segmentCount;
         int i = tmp, h = 1;
         do {
-            if (segments[i] == null) {
+            if (segments[i] == null || segments[i].getKey().isRemoved()) {
                 segments[i] = pair(key, value);
                 size++;
                 return;
@@ -119,7 +119,8 @@ public class QuadraticProbingHashTable implements HashTable<Integer> {
 
         int index = lookup(key);
         if (index > -1) {
-            segments[index] = null;
+            segments[index].getKey().setRemoved();
+            size--;
             return true;
         }
         return false;
@@ -135,12 +136,14 @@ public class QuadraticProbingHashTable implements HashTable<Integer> {
         return size;
     }
 
-    private int lookup(Key key) {
-        int i = key.hashCode() % segmentCount;
+    private int lookup(Key searchingKey) {
+        int i = searchingKey.hashCode() % segmentCount;
         int h = 1;
         while (segments[i] != null) {
-            if (segments[i].getKey().equals(key))
-                return i;
+            var foundKey = segments[i].getKey();
+            if (foundKey.equals(searchingKey)) {
+                return foundKey.isRemoved() ? -1 : i;
+            }
             i = (i + h * h++) % segmentCount;
         }
         return -1;
